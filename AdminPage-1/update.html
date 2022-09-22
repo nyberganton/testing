@@ -1,0 +1,133 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>Update Grocery</title>
+</head>
+<body>
+    <div class="main-div" id="fieldsShow">
+        <h1>Update a grocery</h1>
+        <p>Please enter a Grocery</p>
+        <input type="GroceryName" placeholder="Grocery Name..." id="GroceryName">
+        <input type="price" placeholder="Price..." id="price">
+        <input type="desc" placeholder="Description..." id="desc">
+        <div class="select">
+            <select name="selectStore" id="selectStore">
+                <option selected disabled>Choose a store</option>
+                <option value="ICA">ICA</option>
+                <option value="Coop">Coop</option>
+                <option value="Lidl">Lidl</option>
+                <option value="Willys">Willys</option>
+            </select>
+        </div>
+        <br>
+        <div class="select">
+            <select name="selectUnit" id="selectUnit">
+                <option selected disabled>Choose a price unit</option>
+                <option value="kg">Kg</option>
+                <option value="pc">Pc</option>
+            </select>
+        </div>
+        <br>
+        <button type="button" id="updateGrocery" name="updateGrocery">Update</button>
+        <br>
+        <button onclick="window.location.href='index.html';">Go back</button>
+    </div>
+
+    <div id="tableShow">
+        <h1 style="text-align: center; padding-top: 35px;">Tabell över alla varor</h1>
+        <p style="text-align: center;">Tryck på en rad för att uppdatera.</p>
+        <br>
+        <div class="getButtonStyle">
+            <div class="center">
+                <button type="button" id="loadGrocery" name="LoadGrocery">Load Groceries</button>
+                <button type="button" id="searchGrocery" name="SearchGrocery">Search Groceries</button>
+            </div>
+        </div>
+        <br>
+
+        <br>
+        <div style="overflow-x:auto;">
+            <table id="dataTbl">
+                <tr>
+                    <th>Grocery Name</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Price unit</th>
+                </tr>
+                <tr>
+                    <td>#</td>
+                    <td>#</td>
+                    <td>#</td>
+                    <td>#</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    fieldsShow.style.display = "none";
+    tableShow.style.display = "block";
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-analytics.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+      
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+        apiKey: "AIzaSyD9LPoBNG_zqnnEckfEeWihfcz5yDDu9sw",
+        authDomain: "grocery-price-tracker-fedd5.firebaseapp.com",
+        databaseURL: "https://grocery-price-tracker-fedd5-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "grocery-price-tracker-fedd5",
+        storageBucket: "grocery-price-tracker-fedd5.appspot.com",
+        messagingSenderId: "278930656080",
+        appId: "1:278930656080:web:a2708e3a2a84e14775ba55",
+        measurementId: "G-HE8DPFSTQ8"
+    };
+      
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getDatabase();
+    
+    loadGrocery.addEventListener('click', (e) => {
+
+        $('#dataTbl td').remove();
+
+        const dbRef = ref(db, 'ICA-MaxiNew/');
+
+        onValue(dbRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            const childKey = childSnapshot.key;
+            const childData = childSnapshot.val();
+            // ...
+
+            var row = "<tr><td>" + childData.title + "</td><td>" + childData.price +
+                      "</td><td>" + childData.info + "</td><td>" + childData.unit + "</td></tr>";
+
+            $(row).appendTo('#dataTbl');
+        });
+        }, {
+        onlyOnce: true
+        });
+    });
+
+
+</script>
